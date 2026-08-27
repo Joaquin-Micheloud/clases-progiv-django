@@ -1,13 +1,7 @@
-from django.urls import path 
+from django.urls import path
+from . import views
 
-from . import views 
-
-  
-
-urlpatterns = [ 
-
-    path("health/", views.health_check, name="health_check"), 
-
-] 
-
- 
+urlpatterns = [
+    path("health/", views.health_check, name="health_check"),
+    path("health/version/", views.health_version, name="health_version"),
+]
