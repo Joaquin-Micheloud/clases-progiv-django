@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Optimizar consultas ORM",
+    "priority": "alta",
+    "status": "pendiente"
+  },
+  {
+    "priority": "baja",
+    "status": "pendiente"
+  },
+  {
+    "title": "Documentar comandos de importación",
+    "priority": "media",
+    "status": "completada"
+  }
+]
