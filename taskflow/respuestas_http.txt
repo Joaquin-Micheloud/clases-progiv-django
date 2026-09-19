@@ -1,0 +1,9 @@
+CASO 200 OK
+Comando: curl -i http://127.0.0.1:8000/api/tasks/1/
+Primera línea: HTTP/1.1 200 OK
+Cuerpo: {"id":1,"project":1,"title":"Mi Tarea","description":"","priority":"media","status":"pendiente","due_date":null,"tags":[],"created_at":"2026-11-01T20:00:00Z"}
+
+CASO 400 BAD REQUEST
+Comando: curl -i -X POST http://127.0.0.1:8000/api/tasks/ -H "Content-Type: application/json" -d '{"project": 1, "status": "en_progreso"}'
+Primera línea: HTTP/1.1 400 Bad Request
+Cuerpo: {"error":true,"detail":{"non_field_errors":["No se puede pasar a 'en_progreso' una tarea de un proyecto que todavía no tiene ninguna tarea completada."]}}
