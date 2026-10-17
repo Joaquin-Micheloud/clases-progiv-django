@@ -1,0 +1,10 @@
+DIAGRAMA Y FLUJO COMPLETO DE OAUTH 2.0 / OPENID CONNECT
+
+1. [NAVEGADOR -> NAVEGADOR]: El usuario hace clic en "Ingresar con Google".
+2. [NAVEGADOR -> GOOGLE]: Redirección del navegador hacia la URL de autorización de Google enviando parámetros client_id, redirect_uri, scope y state.
+3. [Navegador/Usuario -> GOOGLE]: El usuario se autentica en Google y concede su consentimiento para compartir su perfil e email.
+4. [GOOGLE -> NAVEGADOR]: Google redirige al navegador de vuelta a nuestra app (redirect_uri) adjuntando un código de autorización temporal (?code=...&state=...).
+5. [NAVEGADOR -> TASKFLOW]: El navegador entrega el código de autorización a nuestro backend.
+6. [TASKFLOW -> GOOGLE] (Servidor a Servidor): TaskFlow envía el 'code' obtenido junto con el 'client_secret' directamente a los servidores de Google de forma segura.
+7. [GOOGLE -> TASKFLOW] (Servidor a Servidor): Google valida el secreto y código, devolviendo los tokens (ID Token en JWT y Access Token).
+8. [TASKFLOW -> NAVEGADOR]: TaskFlow emite sus propios tokens JWT (access y refresh) para dar inicio a la sesión en nuestra API REST.
