@@ -3,19 +3,22 @@ from django.db import transaction
 from django.http import JsonResponse
 from rest_framework import generics, permissions, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError, AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Project, ProjectMembership
+from .models import Project, ProjectMembership, SecurityLog
 from .permissions import IsProjectAdminOrReadOnly
 from .repositories import TaskRepository
 from .serializers import ProjectSerializer, TaskSerializer
 from .serializers_auth import RegisterSerializer
 from .services import MembershipService, TaskService
 
+import logging
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .throttles import LoginRateThrottle
 
 def health_check(request):
     return JsonResponse({"status": "ok", "service": "TaskFlow API"})
@@ -134,3 +137,23 @@ class SocialLoginJWTView(APIView):
         return Response(
             {"refresh": str(refresh), "access": str(refresh.access_token)}
         )
+
+security_logger = logging.getLogger("security")
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [LoginRateThrottle]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except AuthenticationFailed:
+            ip = request.META.get("REMOTE_ADDR")
+            username = request.data.get("username", "desconocido")
+            SecurityLog.objects.create(
+                user=None,
+                ip_address=ip,
+                action="login_failed",
+                details=f"Intento fallido para el usuario: {username}"
+            )
+            security_logger.warning(f"Intento de login fallido desde IP {ip} para usuario {username}")
+            raise
